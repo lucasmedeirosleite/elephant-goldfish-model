@@ -16,6 +16,7 @@ text.
 | Claude Cowork | Install from claude.ai/plugins or the Cowork plugin panel via marketplace `google/elephant-goldfish-model` |
 | Codex | `codex plugin marketplace add google/elephant-goldfish-model && codex plugin add egm@egm` |
 | ChatGPT | Personal testing: Plugins > Add > Upload plugin archive; see [packaging](codex.md#chatgpt). Workspace import: Admin > Plugins > Add > Import marketplace, repo URL `https://github.com/google/elephant-goldfish-model`, path `.agents/plugins` |
+| T3 Code | Install EGM as a Claude Code plugin and/or Codex skills; T3 threads on those providers load them |
 | omp | `omp plugin marketplace add google/elephant-goldfish-model && omp plugin install egm@egm` |
 | Muse | `git clone https://github.com/google/elephant-goldfish-model.git && muse plugins install ./elephant-goldfish-model --scope user && muse plugins approve egm` |
 
@@ -69,6 +70,7 @@ while `agents/` contains reviewer personas. All hosts share the same `skills/`,
 | Claude Cowork | `.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json` | `skills/` (default) | Subagents run inside Cowork; hooks n/a |
 | Codex | `.codex-plugin/plugin.json`, `.agents/plugins/marketplace.json` | `skills` path | Not shipped; general-purpose subagent reads the persona file |
 | ChatGPT | `plugin.json`, `.codex-plugin/plugin.json`; `.agents/plugins/marketplace.json` for workspace import | `skills` path | Detect native tools in the current session; general-purpose agent reads the persona |
+| T3 Code | Claude/Codex manifests (host underneath) | `skills/` | `agents/` (read via persona path) |
 | omp | `.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json` (Claude-compatible fallback) | `skills/` (default) | Personas from `agents/`/`.claude-plugin/agents/` register as native `task` agents |
 | Muse | `.claude-plugin/plugin.json` (Claude-compatible fallback) | `skills/` (default) | 9 adapters import as agents; tool projections unsupported |
 
@@ -95,6 +97,7 @@ phrase to its own tool:
 | Claude Cowork | Cowork subagents | Yes | Subagents run inside Cowork |
 | Codex | Native spawn/wait tools; inspect the available schema | No | Detect at runtime; direct dispatch fallback |
 | ChatGPT | Native spawn/wait tools when exposed by the current Work session | No | Detect at runtime; direct dispatch fallback |
+| T3 Code | `delegate_task` (`agent` = persona name) | Yes | Yes |
 | omp | `task` tool | Yes | Yes |
 | Muse | Native subagents; inspect the available schema | Named spawn rejected in 1.4.14; general-purpose fallback verified | Detect at runtime; direct dispatch fallback |
 
@@ -157,6 +160,12 @@ control is verified here for Codex or Antigravity.
 **omp** ([#186](https://github.com/google/elephant-goldfish-model/issues/186)) has a working installation path. Skills are invoked as `/skill:egm-<command>` (omp registers one command per skill; it has no `/egm-*` namespace). Community-verified on omp v18.12.6: all seven skills discover and resolve, and all nine reviewer personas register as subagents. End-to-end workflow fixtures are not yet automated for omp.
 
 **Muse** (1.4.14) has a working installation path. `muse plugins validate` reports the plugin valid with all seven skills and all nine agent adapters supported; every agent tool projection is unsupported, so Claude tool allowlists do not restrict Muse reviewers. Install from a local path; `marketplace add` on this repository discovers zero plugins because Muse reads the Codex catalog first. End-to-end workflow fixtures passed on 2026-10-30 (brainstorm, draft, and uninterrupted review with 15 fresh-context reviewers); named `egm/egm-*` agents cannot be spawned in this runtime, so reviewers used the general-purpose fallback reading the installed persona first. See the [Muse guide](https://github.com/google/elephant-goldfish-model/blob/main/docs/muse.md). No skill routes a Muse session to that guide yet ([#252](https://github.com/google/elephant-goldfish-model/issues/252)), so point the session at it.
+
+**T3 Code** is experimental until brainstorm, draft, and review have each run
+end to end and the runs are recorded in `TESTING.md`. It uses the installed
+Claude/Codex resources and T3's `delegate_task` with persona-to-model role
+mapping. See the [T3 Code guide](t3code.md) for installation, dispatch, model
+roles, and the instruction-file, permission, and follow-up-message limits.
 
 See the [harness test record](https://github.com/google/elephant-goldfish-model/blob/main/TESTING.md#harness-test-record) for tested surfaces and limits.
 

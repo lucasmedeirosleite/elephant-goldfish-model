@@ -70,6 +70,7 @@ def test_runtime_bundle_is_complete_and_reproducible(
     assert "agents/design_critic.md" in names
     assert "docs/codex.md" in names
     assert "docs/claude.md" in names
+    assert "docs/t3code.md" in names
     assert "assets/icon.svg" in names
     for image in re.findall(r'<img\b[^>]*\bsrc="([^"]+)"', bundle.read("README.md").decode()):
       assert image in names, f"Unbundled README image: {image}"
@@ -310,6 +311,7 @@ def test_refuses_unbundled_services(source: Path, tmp_path: Path, field: str) ->
     "resources/execution_instructions.md",
     "resources/document_standards/zoom-out-standard.md",
     "docs/harnesses.md",
+    "docs/t3code.md",
 ])
 def test_incomplete_source_fails_before_output(
     source: Path, tmp_path: Path, target: str, missing: str,

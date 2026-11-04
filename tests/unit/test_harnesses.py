@@ -226,6 +226,29 @@ def test_dispatch_paragraph_names_t3_mapping() -> None:
   assert dispatch_skills, "No canonical skills contain the shared dispatch paragraph"
 
 
+def test_t3code_guide_persona_names_are_canonical() -> None:
+  guide = ROOT / "docs/t3code.md"
+  assert guide.is_file(), "Missing T3 Code host guide"
+  blocks = [
+      json.loads(block)
+      for block in re.findall(r"```json\n(.*?)\n```", guide.read_text(
+          encoding="utf-8"), re.DOTALL)
+  ]
+  mappings = [block["agentModelRoles"] for block in blocks
+              if "agentModelRoles" in block]
+  assert len(mappings) == 1, "Expected one recommended agentModelRoles block"
+  personas = {frontmatter(path)["name"]
+              for path in (ROOT / "agents").glob("*.md")}
+  assert set(mappings[0]) == personas
+
+
+def test_harnesses_lists_t3code() -> None:
+  text = (ROOT / "docs/harnesses.md").read_text(encoding="utf-8")
+  delegation = text.split("## Delegation\n", 1)[1].split("\n## ", 1)[0]
+  assert "| T3 Code |" in delegation
+  assert re.search(r"\[[^]]+\]\(t3code\.md(?:#[^)]*)?\)", text)
+
+
 def test_bundled_prompt_dependencies_and_harness_guides() -> None:
   assert (ROOT / "docs/claude.md").is_file()
   assert (ROOT / "docs/codex.md").is_file()
