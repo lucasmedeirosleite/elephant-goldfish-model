@@ -112,7 +112,7 @@ settings object. Adjust the example role assignments to your own roles:
 For local delegations, model selection precedence is:
 
 1. A mapped agent uses its role; any caller-supplied `target` is ignored.
-2. Otherwise, an explicit provider/model target is used.
+2. Otherwise, an explicit `target` is used.
 3. Without either, a `task` role is used if defined.
 4. Otherwise, the child inherits the caller's model.
 
