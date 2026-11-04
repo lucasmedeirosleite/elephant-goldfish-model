@@ -215,6 +215,17 @@ def test_claude_manifest_agents_and_shared_personas_resolve() -> None:
   assert len(personas) == len(set(personas)), "Ambiguous persona name"
 
 
+def test_dispatch_paragraph_names_t3_mapping() -> None:
+  dispatch_skills = []
+  for skill in (ROOT / "skills").glob("*/SKILL.md"):
+    text = skill.read_text(encoding="utf-8")
+    if "Antigravity: `invoke_subagent`" in text:
+      dispatch_skills.append(skill)
+      assert "T3 Code: `delegate_task`" in text, (
+          f"{skill.relative_to(ROOT)} omits the T3 Code dispatch mapping")
+  assert dispatch_skills, "No canonical skills contain the shared dispatch paragraph"
+
+
 def test_bundled_prompt_dependencies_and_harness_guides() -> None:
   assert (ROOT / "docs/claude.md").is_file()
   assert (ROOT / "docs/codex.md").is_file()
